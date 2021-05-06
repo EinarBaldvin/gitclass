@@ -18,6 +18,7 @@ vcf_indel=indel_snps/478sam.dp8_gq20.HC.filtered.INDEL.biall.var_nonvar1.chr.vcf
 
 # Read in list of genes to be extracted
 # v5 change start and end of extraction
+# I hope never to use this again!!!!
 while read -r chr start end strand horvu exon
 
 do
@@ -58,7 +59,7 @@ vcf_temp=temp.${horvu}.${exon}.all.${list}
 
 fi #1
 
-# To fix missing refs
+# Trying to fix missing refs
 
 for i in {10..22}; do cut -f$i $vcf_temp | sed 's/:PASS//g' | awk 'BEGIN{FS=":|"; OFS=":"}{if(NF <= 4 && $1 ~ "\\./\\." && $3 == 0 && $2 > 30)sub("\\./\\.","0/0",$1);print}' | sed 's/:0:/,0:/' > $i.temp; done
 
@@ -110,7 +111,7 @@ done < ${genes}
 
 wait
 
-# Paste everything together, copy ref CDS fasta from Morex !!! taken out because of using MACSEv2 (stop codons removed at the end if present)!!!
+# Paste everything together, copy ref CDS fasta from Morex !!! taken out because of using MACSEv2 (stop codons removed at the end if present)!!! This is such a mess!
 cat ${genes} | awk '{print $5}' | sort -u | while read line; do cat <(paste -d "\0" $line\_*) <(grep -m 1 -A 1 $line ../reference/160517_Hv_IBSC_PGSB_r1_CDS_HighLowConf_REPR_annotation.unwrapped.fasta | sed 's/...$//' ) | sed '/ 01.*//' > ext_genes/$line.fa ; done
 
 wait
